@@ -280,12 +280,11 @@ def get_segment_offsets(
                 if "end" in word_offsets[i - 1]:
                     segment_offsets[-1]["end"] = word_offsets[i - 1]["end"]
 
-                segment_words = [word]
+                segment_words = []
                 previous_word_index = i
-                continue
 
         # check if the word ends with any delimeter token or the word itself is a delimeter
-        elif word and (word[-1] in segment_delimiter_tokens or word in segment_delimiter_tokens):
+        if word and (word[-1] in segment_delimiter_tokens or word in segment_delimiter_tokens):
             segment_words.append(word)
             if segment_words:
                 segment_offsets.append(

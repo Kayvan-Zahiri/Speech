@@ -82,6 +82,23 @@ class BaseTimestampsTest:
         ]
 
     @property
+    def word_offsets_gap_and_delimiter(self):
+        # the gap before 'e.' exceeds a threshold of 10, and 'e.' also ends with a delimiter
+        return [
+            {'word': 'e', 'start_offset': 0, 'end_offset': 1},
+            {'word': 'e.', 'start_offset': 20, 'end_offset': 21},
+            {'word': 'e', 'start_offset': 22, 'end_offset': 23},
+        ]
+
+    @property
+    def segment_offsets_expected_output_gap_and_delimiter(self):
+        return [
+            {'segment': 'e', 'start_offset': 0, 'end_offset': 1},
+            {'segment': 'e.', 'start_offset': 20, 'end_offset': 21},
+            {'segment': 'e', 'start_offset': 22, 'end_offset': 23},
+        ]
+
+    @property
     def char_offsets_wpe(self):
         char_offsets = [
             {"char": "nineteen", "start_offset": 0, "end_offset": 1},
@@ -315,3 +332,24 @@ class BaseTimestampsTest:
         )
 
         assert segment_offsets == self.segment_offsets_expected_output_gap
+
+    def test_segment_offsets_delimiter_with_gap_threshold(self):
+        # setting a gap threshold must not stop the delimiters from splitting segments
+        segment_offsets = get_segment_offsets(
+            word_offsets=self.word_offsets_chars_expected_output,
+            segment_delimiter_tokens=['.', '!', '?'],
+            supported_punctuation={'.', '!', '?'},
+            segment_gap_threshold=10,
+        )
+
+        assert segment_offsets == self.segment_offsets_expected_output
+
+    def test_segment_offsets_gap_and_delimiter_on_same_word(self):
+        segment_offsets = get_segment_offsets(
+            word_offsets=self.word_offsets_gap_and_delimiter,
+            segment_delimiter_tokens=['.', '!', '?'],
+            supported_punctuation={'.', '!', '?'},
+            segment_gap_threshold=10,
+        )
+
+        assert segment_offsets == self.segment_offsets_expected_output_gap_and_delimiter
